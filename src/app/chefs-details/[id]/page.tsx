@@ -1,25 +1,20 @@
-"use client";
-
-import React, { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation'; // To get the route dynamically
-import Nav from '@/app/components/Nav';
+"use client"
 import Footer from '@/app/components/Footer';
+import Nav from '@/app/components/Nav';
 import { client } from '@/sanity/lib/client';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 
-const DetailsPage = () => {
+const DetailsPage = ({ params }: any) => {
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const pathname = usePathname(); // Get the current pathname
-  const slug = pathname.split('/').pop(); // Extract the slug from the URL
+  const { id }: any = React.use(params); // Accessing the id from params
 
   useEffect(() => {
-    if (!slug) return; // Wait for the slug to be available
-
     async function fetchData() {
       try {
         const query = `
-          *[_type == "chef" && slug.current == $slug][0]{
+          *[_type == "chef" && slug.current == $id][0]{
             name,
             position,
             experience,
@@ -30,10 +25,8 @@ const DetailsPage = () => {
             available,
           }
         `;
-
-        // Fetch data from Sanity
-        const data = await client.fetch(query, { slug });
-        setProduct(data);
+        const myData = await client.fetch(query, { id });
+        setProduct(myData);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -42,7 +35,7 @@ const DetailsPage = () => {
     }
 
     fetchData();
-  }, [slug]);
+  }, [id]);
 
   if (loading) {
     return (
@@ -74,7 +67,7 @@ const DetailsPage = () => {
       <div className="p-6 md:p-10 lg:p-16">
         <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="text-center py-6 bg-orange-600 text-white">
-            <h1 className="text-2xl md:text-3xl font-bold">Chef Details</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">Chefs Details</h1>
           </div>
 
           <div className="lg:flex-col p-6">
@@ -96,6 +89,11 @@ const DetailsPage = () => {
                 <h3 className="text-lg font-bold text-red-600 underline">
                   Experience: <span>{product.experience} Years</span>
                 </h3>
+                {/* <div>
+              specialty  {product.specialty && (
+                  <h3 className="text-lg text-gray-500 ">{product.specialty}</h3>
+                )}
+                </div> */}
               </div>
               <div className="mt-3">
                 {product.available ? (
@@ -111,6 +109,7 @@ const DetailsPage = () => {
       <Footer />
     </div>
   );
-};
+}
 
-export default DetailsPage;
+export default DetailsPage;  // Default export of the component
+
