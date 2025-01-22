@@ -1,53 +1,40 @@
-"use client"
 import Footer from '@/app/components/Footer';
 import Nav from '@/app/components/Nav';
 import { client } from '@/sanity/lib/client';
-import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 
-const DetailsPage = ({ params }: any) => {
-  const [product, setProduct] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const { id }: any = React.use(params); // Accessing the id from params
+export async function getServerSideProps({ params }: any) {
+  const { id } = params;
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const query = `
-          *[_type == "chef" && slug.current == $id][0]{
-            name,
-            position,
-            experience,
-            specialty,
-            slug,
-            "image_url": image.asset->url,
-            description,
-            available,
-          }
-        `;
-        const myData = await client.fetch(query, { id });
-        setProduct(myData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
+  try {
+    const query = `
+      *[_type == "chef" && slug.current == $id][0]{
+        name,
+        position,
+        experience,
+        specialty,
+        slug,
+        "image_url": image.asset->url,
+        description,
+        available,
       }
+    `;
+    const product = await client.fetch(query, { id });
+
+    if (!product) {
+      return { notFound: true }; // Render 404 page
     }
 
-    fetchData();
-  }, [id]);
-
-  if (loading) {
-    return (
-      <div>
-        <Nav />
-        <div className="p-10 text-center">
-          <h1 className="text-2xl font-bold">Loading...</h1>
-        </div>
-      </div>
-    );
+    return {
+      props: { product }, // Pass product data to the component
+    };
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    return { props: { product: null } }; // Fallback on error
   }
+}
 
+const DetailsPage = ({ product }: any) => {
   if (!product) {
     return (
       <div>
@@ -89,11 +76,6 @@ const DetailsPage = ({ params }: any) => {
                 <h3 className="text-lg font-bold text-red-600 underline">
                   Experience: <span>{product.experience} Years</span>
                 </h3>
-                {/* <div>
-              specialty  {product.specialty && (
-                  <h3 className="text-lg text-gray-500 ">{product.specialty}</h3>
-                )}
-                </div> */}
               </div>
               <div className="mt-3">
                 {product.available ? (
@@ -109,6 +91,6 @@ const DetailsPage = ({ params }: any) => {
       <Footer />
     </div>
   );
-}
+};
 
-export default DetailsPage;  // Default export of the component
+export default DetailsPage;
