@@ -120,7 +120,9 @@ export default function Home() {
 
 
     {/* 4th page */}
-    
+    <div className="mt-28">
+      <Image src="/Clients.png"  width={1800} height={1800} alt="bg" className="w-screen h-auto" />
+    </div>
     {/* 4th page close */}
 
 
