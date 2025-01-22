@@ -1,38 +1,60 @@
+"use client";
+
 import Footer from '@/app/components/Footer';
 import Nav from '@/app/components/Nav';
-import { client } from '@/sanity/lib/client';
+import { client } from '@/sanity/lib/client'; // Ensure this is correctly set up
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 
-export const getServerSideProps = async (context: any) => {
-  const { id } = context.params;
+const DetailsPage = () => {
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const { id } = router.query; // Extract the dynamic `id` from the URL
 
-  try {
-    const query = `
-      *[_type == "chef" && slug.current == $id][0]{
-        name,
-        position,
-        experience,
-        specialty,
-        slug,
-        "image_url": image.asset->url,
-        description,
-        available,
+  useEffect(() => {
+    if (!id) return; // Wait for the `id` to be available from the router
+
+    async function fetchData() {
+      try {
+        const query = `
+          *[_type == "chef" && slug.current == $id][0]{
+            name,
+            position,
+            experience,
+            specialty,
+            slug,
+            "image_url": image.asset->url,
+            description,
+            available,
+          }
+        `;
+
+        // Fetch data from Sanity
+        const myData = await client.fetch(query, { id });
+        setProduct(myData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
-    `;
-    const product = await client.fetch(query, { id });
-
-    if (!product) {
-      return { notFound: true }; // Show a 404 page if no data is found
     }
 
-    return { props: { product } };
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    return { props: { product: null } }; // Handle errors gracefully
-  }
-};
+    fetchData();
+  }, [id]); // Fetch data whenever the `id` changes
 
-const DetailsPage = ({ product }: any) => {
+  if (loading) {
+    return (
+      <div>
+        <Nav />
+        <div className="p-10 text-center">
+          <h1 className="text-2xl font-bold">Loading...</h1>
+        </div>
+      </div>
+    );
+  }
+
   if (!product) {
     return (
       <div>
@@ -52,8 +74,9 @@ const DetailsPage = ({ product }: any) => {
       <div className="p-6 md:p-10 lg:p-16">
         <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
           <div className="text-center py-6 bg-orange-600 text-white">
-            <h1 className="text-2xl md:text-3xl font-bold">Chefs Details</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">Chef Details</h1>
           </div>
+
           <div className="lg:flex-col p-6">
             <div className="lg:w-1/2 mb-6 lg:mb-0 flex justify-center items-center m-auto">
               <Image
@@ -64,6 +87,7 @@ const DetailsPage = ({ product }: any) => {
                 className="w-full h-auto max-h-[350px] object-cover rounded-lg shadow-md"
               />
             </div>
+
             <div className="lg:w-1/2 lg:pl-8 m-auto">
               <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4 mt-6">{product.name}</h2>
               <p className="text-gray-600 mb-4 text-sm md:text-base">{product.description}</p>
