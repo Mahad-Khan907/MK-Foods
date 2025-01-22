@@ -1,25 +1,25 @@
 "use client";
 
-import Footer from '@/app/components/Footer';
-import Nav from '@/app/components/Nav';
-import { client } from '@/sanity/lib/client'; // Ensure this is correctly set up
 import React, { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation'; // To get the route dynamically
+import Nav from '@/app/components/Nav';
+import Footer from '@/app/components/Footer';
+import { client } from '@/sanity/lib/client';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
 
 const DetailsPage = () => {
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  const { id } = router.query; // Extract the dynamic `id` from the URL
+  const pathname = usePathname(); // Get the current pathname
+  const slug = pathname.split('/').pop(); // Extract the slug from the URL
 
   useEffect(() => {
-    if (!id) return; // Wait for the `id` to be available from the router
+    if (!slug) return; // Wait for the slug to be available
 
     async function fetchData() {
       try {
         const query = `
-          *[_type == "chef" && slug.current == $id][0]{
+          *[_type == "chef" && slug.current == $slug][0]{
             name,
             position,
             experience,
@@ -32,8 +32,8 @@ const DetailsPage = () => {
         `;
 
         // Fetch data from Sanity
-        const myData = await client.fetch(query, { id });
-        setProduct(myData);
+        const data = await client.fetch(query, { slug });
+        setProduct(data);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -42,7 +42,7 @@ const DetailsPage = () => {
     }
 
     fetchData();
-  }, [id]); // Fetch data whenever the `id` changes
+  }, [slug]);
 
   if (loading) {
     return (
