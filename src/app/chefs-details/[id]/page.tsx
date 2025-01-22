@@ -3,8 +3,8 @@ import Nav from '@/app/components/Nav';
 import { client } from '@/sanity/lib/client';
 import Image from 'next/image';
 
-export async function getServerSideProps({ params }: any) {
-  const { id } = params;
+export const getServerSideProps = async (context: any) => {
+  const { id } = context.params;
 
   try {
     const query = `
@@ -22,17 +22,15 @@ export async function getServerSideProps({ params }: any) {
     const product = await client.fetch(query, { id });
 
     if (!product) {
-      return { notFound: true }; // Render 404 page
+      return { notFound: true }; // Show a 404 page if no data is found
     }
 
-    return {
-      props: { product }, // Pass product data to the component
-    };
+    return { props: { product } };
   } catch (error) {
-    console.error("Error fetching product:", error);
-    return { props: { product: null } }; // Fallback on error
+    console.error('Error fetching data:', error);
+    return { props: { product: null } }; // Handle errors gracefully
   }
-}
+};
 
 const DetailsPage = ({ product }: any) => {
   if (!product) {
@@ -56,7 +54,6 @@ const DetailsPage = ({ product }: any) => {
           <div className="text-center py-6 bg-orange-600 text-white">
             <h1 className="text-2xl md:text-3xl font-bold">Chefs Details</h1>
           </div>
-
           <div className="lg:flex-col p-6">
             <div className="lg:w-1/2 mb-6 lg:mb-0 flex justify-center items-center m-auto">
               <Image
@@ -67,7 +64,6 @@ const DetailsPage = ({ product }: any) => {
                 className="w-full h-auto max-h-[350px] object-cover rounded-lg shadow-md"
               />
             </div>
-
             <div className="lg:w-1/2 lg:pl-8 m-auto">
               <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4 mt-6">{product.name}</h2>
               <p className="text-gray-600 mb-4 text-sm md:text-base">{product.description}</p>
