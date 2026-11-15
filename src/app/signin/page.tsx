@@ -1,64 +1,140 @@
-import React from 'react'
-import Nav from '../components/Nav'
-import Footer from '../components/Footer'
-import { FaAngleRight } from "react-icons/fa6";
-import { FaGoogle, FaApple } from "react-icons/fa";
-import "../styles/other.css"
-import Image from 'next/image';
+"use client";
 
-const page = () => {
+import React, { useState } from "react";
+import Nav from "../components/Nav";
+import Footer from "../components/Footer";
+import Link from "next/link";
+import { FaAngleRight, FaGoogle, FaApple } from "react-icons/fa6";
+import { HiOutlineMail, HiOutlineLockClosed, HiOutlineSparkles } from "react-icons/hi";
+import { IoMdFlame } from "react-icons/io";
+
+export default function SignInPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(true);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    alert("Welcome back to MK Foods! Signing you in...");
+  };
+
   return (
-    <div>
+    <div className="bg-[#080c14] min-h-screen text-slate-100 flex flex-col justify-between">
+      <div>
+        <Nav />
 
-        <Nav/>
-              <div className="relative">
-           <Image 
-             src="/nav.png" alt="bg"   width={700} height={700} className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover " />
-           <h1 className="absolute inset-0 flex justify-center items-center text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">
-             Sign In
-           </h1>
-           <div className="absolute inset-0 flex justify-center items-center flex-col mt-20 sm:mt-32 lg:mt-36">
-             <h2 className="flex items-center text-sm sm:text-base md:text-lg text-white gap-1">
-               Home <FaAngleRight /> <span className="text-orange-400">Sign In</span>
-             </h2>
-           </div>
-         </div>
+        <div className="max-w-md mx-auto px-4 py-16 sm:py-24">
+          <div className="rounded-3xl bg-[#0f172a]/90 border border-white/10 p-8 sm:p-10 shadow-2xl backdrop-blur-xl">
+            
+            <div className="text-center mb-8">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white mx-auto mb-3 shadow-lg shadow-amber-500/30">
+                <IoMdFlame className="text-2xl" />
+              </div>
+              <h1 className="text-2xl font-black text-white">Welcome Back</h1>
+              <p className="text-xs text-slate-400 mt-1">
+                Sign in to track your gourmet orders & unlock VIP foodie rewards
+              </p>
+            </div>
 
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-slate-300 block mb-1.5">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <HiOutlineMail className="absolute left-3.5 top-3 text-slate-400 text-base" />
+                  <input
+                    type="email"
+                    required
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 transition"
+                  />
+                </div>
+              </div>
 
+              <div>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="text-xs font-semibold text-slate-300">
+                    Password
+                  </label>
+                  <a href="#" className="text-[11px] text-amber-400 hover:underline">
+                    Forgot password?
+                  </a>
+                </div>
+                <div className="relative">
+                  <HiOutlineLockClosed className="absolute left-3.5 top-3 text-slate-400 text-base" />
+                  <input
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 transition"
+                  />
+                </div>
+              </div>
 
-    <div className='flex justify-center items-center m-auto w-full h-screen'>
-        <div className='bg-white shadow-md shadow-slate-300 m-auto p-4'>
-        <h1 className='text-[25px] font-bold'>Sign In</h1>
-        <div className='border border-slate-200 w-[300px] h-[35px] mt-6'>
-        <input type="email" name='Email' placeholder='Email' /><br /></div>
-        <div className='border border-slate-200 w-[300px] h-[35px] mt-3'>
-        <input type="password" name='password' placeholder='Password' />
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  type="checkbox"
+                  id="remember"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className="accent-amber-500 rounded"
+                />
+                <label htmlFor="remember" className="text-xs text-slate-400 cursor-pointer">
+                  Keep me signed in on this device
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold text-xs shadow-lg shadow-orange-600/30 transition hover:scale-[1.01] active:scale-[0.99] mt-2"
+              >
+                Sign In to Account
+              </button>
+            </form>
+
+            <div className="relative my-6 text-center">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/10" />
+              </div>
+              <span className="relative bg-[#0f172a] px-3 text-[11px] text-slate-500 uppercase tracking-wider font-semibold">
+                Or continue with
+              </span>
+            </div>
+
+            <div className="space-y-2.5">
+              <button
+                type="button"
+                className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold text-xs flex items-center justify-center gap-2 transition"
+              >
+                <FaGoogle className="text-amber-400 text-sm" />
+                <span>Continue with Google</span>
+              </button>
+              <button
+                type="button"
+                className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold text-xs flex items-center justify-center gap-2 transition"
+              >
+                <FaApple className="text-white text-base" />
+                <span>Continue with Apple</span>
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-400 text-center mt-6">
+              Don't have an account yet?{" "}
+              <Link href="/signup" className="text-amber-400 font-bold hover:underline">
+                Create Account
+              </Link>
+            </p>
+
+          </div>
         </div>
-        <div className='flex gap-2 mt-4'>
-        <input type="checkbox" name="checkbox" /> <p className='text-[13px]'>Remember me?</p> 
-        </div>
-        <div className='bg-yellow-500 mt-6 text-white w-[300px] h-[35px] flex justify-center items-center m-auto'>
-        <button className=''>Sign In</button></div>
-        <div className='flex justify-end mt-3'>
-            <h1 className='text-[13px] text-slate-500'>Forger Password?</h1>
-        </div>
-        <div className='flex justify-center border border-slate-300 w-8 h-6 m-auto'>
-            <h1 className='text-[13px] text-slate-600'>OR
-            </h1></div>
+      </div>
 
-            <button className="flex mt-6 items-center justify-center w-full bg-orange-600 text-white py-2 px-4 rounded-md mb-4 hover:bg-red-600 transition duration-300">
-          <FaGoogle className="mr-2 text-lg" />
-          Sign up with Google
-        </button>
-        <button className="flex items-center justify-center w-full bg-black text-white py-2 px-4 rounded-md mb-6 hover:bg-gray-800 transition duration-300">
-          <FaApple className="mr-2 text-lg" />
-          Sign up with Apple
-        </button>
-    </div></div>
-    <Footer/>
-
+      <Footer />
     </div>
-  )
+  );
 }
-
-export default page

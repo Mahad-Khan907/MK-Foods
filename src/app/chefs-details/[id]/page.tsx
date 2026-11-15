@@ -1,115 +1,167 @@
-"use client"
-import Footer from '@/app/components/Footer';
-import Nav from '@/app/components/Nav';
-import { client } from '@/sanity/lib/client';
-import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
+"use client";
 
-const DetailsPage = ({ params }: any) => {
-  const [product, setProduct] = useState<any>(null);
+import React, { useEffect, useState } from "react";
+import Nav from "@/app/components/Nav";
+import Footer from "@/app/components/Footer";
+import { client } from "@/sanity/lib/client";
+import Image from "next/image";
+import Link from "next/link";
+import { FaAngleRight } from "react-icons/fa6";
+import { HiStar, HiOutlineSparkles, HiOutlineArrowRight } from "react-icons/hi2";
+
+const fallbackChefs: Record<string, any> = {
+  "marcus-vance": {
+    name: "Chef Marcus Vance",
+    position: "Executive Head Chef",
+    experience: "15+ Years in Fine Dining",
+    specialty: "French & Modern Italian Gastronomy",
+    image_url: "/chef1 (1).png",
+    description: "Trained under Michelin-starred kitchens in Lyon and Florence. Marcus brings refined European culinary disciplines and precision techniques to MK Foods, constantly innovating our seasonal menu.",
+    awards: "Michelin Star Alum • Golden Spoon Award",
+  },
+  "elena-rostova": {
+    name: "Chef Elena Rostova",
+    position: "Master Pastry & Bakery Artisan",
+    experience: "12+ Years Experience",
+    specialty: "Sourdough Fermentation & European Desserts",
+    image_url: "/chef1 (2).png",
+    description: "Elena oversees our 48-hour sourdough pizza fermentation and handcrafts our legendary Belgian molten chocolate cakes and gelatos.",
+    awards: "Pastry Champion 2024 • Master Chocolatier",
+  },
+  "tariq-mehmood": {
+    name: "Chef Tariq Mehmood",
+    position: "Master Pitmaster & Grill Head",
+    experience: "18+ Years Experience",
+    specialty: "Smoked Cuts & Artisanal BBQ",
+    image_url: "/chef1 (3).png",
+    description: "Specializing in Texas white oak smoking and prime cut butchery. Tariq guarantees that every ribeye, wagyu burger, and salmon fillet is grilled to absolute perfection.",
+    awards: "National Grill Champion • Certified Pitmaster",
+  },
+  "chloe-nguyen": {
+    name: "Chef Chloe Nguyen",
+    position: "Artisan Burger & Fusion Stylist",
+    experience: "10+ Years Experience",
+    specialty: "Gourmet Street Food & Modern Sauces",
+    image_url: "/chef1 (4).png",
+    description: "Chloe innovates our signature sauce formulations, from black garlic aioli to habanero hot honey glazes, ensuring bold, unforgettable flavor profiles.",
+    awards: "Burger Cup Winner 2025 • Sauce Master",
+  },
+};
+
+export default function ChefDetailsPage({ params }: any) {
+  const unwrappedParams: any = React.use(params);
+  const id = unwrappedParams?.id;
+
+  const [chef, setChef] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const { id }: any = React.use(params); // Accessing the id from params
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchChef() {
       try {
-        const query = `
-          *[_type == "chef" && slug.current == $id][0]{
-            name,
-            position,
-            experience,
-            specialty,
-            slug,
-            "image_url": image.asset->url,
-            description,
-            available,
-          }
-        `;
-        const myData = await client.fetch(query, { id });
-        setProduct(myData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+        const query = `*[_type == "chef" && slug.current == $id][0]{
+          name,
+          position,
+          experience,
+          specialty,
+          slug,
+          "image_url": image.asset->url,
+          description,
+          available,
+        }`;
+        const data = await client.fetch(query, { id });
+        if (data) {
+          setChef(data);
+        } else {
+          setChef(fallbackChefs[id] || fallbackChefs["marcus-vance"]);
+        }
+      } catch (err) {
+        setChef(fallbackChefs[id] || fallbackChefs["marcus-vance"]);
       } finally {
         setLoading(false);
       }
     }
-
-    fetchData();
+    if (id) fetchChef();
   }, [id]);
 
-  if (loading) {
-    return (
-      <div>
-        <Nav />
-        <div className="p-10 text-center">
-          <h1 className="text-2xl font-bold">Loading...</h1>
-        </div>
-      </div>
-    );
-  }
-
-  if (!product) {
-    return (
-      <div>
-        <Nav />
-        <div className="p-10 text-center">
-          <h1 className="text-2xl font-bold text-red-600">Data Not Found</h1>
-          <p className="text-gray-600 mt-4">We couldn't find the data you're looking for.</p>
-          <a href="/chefs" className="mt-6 text-blue-500 underline">Back to Chefs page</a>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div>
-      <Nav />
-      <div className="p-6 md:p-10 lg:p-16">
-        <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-          <div className="text-center py-6 bg-orange-600 text-white">
-            <h1 className="text-2xl md:text-3xl font-bold">Chefs Details</h1>
-          </div>
+    <div className="bg-[#080c14] min-h-screen text-slate-100 flex flex-col justify-between">
+      <div>
+        <Nav />
 
-          <div className="lg:flex-col p-6">
-            <div className="lg:w-1/2 mb-6 lg:mb-0 flex justify-center items-center m-auto">
-              <Image
-                src={product.image_url}
-                alt={product.name}
-                width={700}
-                height={700}
-                className="w-full h-auto max-h-[350px] object-cover rounded-lg shadow-md"
-              />
-            </div>
-
-            <div className="lg:w-1/2 lg:pl-8 m-auto">
-              <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4 mt-6">{product.name}</h2>
-              <p className="text-gray-600 mb-4 text-sm md:text-base">{product.description}</p>
-              <p className="text-blue-600 mb-4 text-sm md:text-base underline">{product.position}</p>
-              <div className="flex flex-wrap items-center gap-4 mt-4">
-                <h3 className="text-lg font-bold text-red-600 underline">
-                  Experience: <span>{product.experience} Years</span>
-                </h3>
-                {/* <div>
-              specialty  {product.specialty && (
-                  <h3 className="text-lg text-gray-500 ">{product.specialty}</h3>
-                )}
-                </div> */}
-              </div>
-              <div className="mt-3">
-                {product.available ? (
-                  <p className="text-sm text-green-600 mt-2">Available Right Now</p>
-                ) : (
-                  <p className="text-sm text-red-600 mt-2">Not Available</p>
-                )}
-              </div>
+        {/* Breadcrumb Header */}
+        <div className="py-8 sm:py-12 bg-gradient-to-b from-[#0f172a] to-[#080c14] border-b border-white/5">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
+              <Link href="/" className="hover:text-amber-400">Home</Link>
+              <FaAngleRight className="text-[10px] text-amber-500" />
+              <Link href="/chefs" className="hover:text-amber-400">Chefs</Link>
+              <FaAngleRight className="text-[10px] text-amber-500" />
+              <span className="text-amber-400 font-semibold">{chef?.name || "Chef Profile"}</span>
             </div>
           </div>
         </div>
+
+        {/* Content */}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+          {loading ? (
+            <div className="py-24 text-center">
+              <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-sm font-semibold text-slate-300">Loading chef profile...</p>
+            </div>
+          ) : !chef ? (
+            <div className="py-20 text-center">
+              <h2 className="text-2xl font-bold text-white">Chef Not Found</h2>
+              <Link href="/chefs" className="mt-4 inline-block text-amber-400 hover:underline">
+                Back to Chefs
+              </Link>
+            </div>
+          ) : (
+            <div className="rounded-3xl bg-[#0f172a]/80 border border-white/10 p-8 sm:p-12 shadow-2xl backdrop-blur-xl grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
+              
+              <div className="md:col-span-5 rounded-2xl overflow-hidden bg-black/40 border border-white/10 h-80 sm:h-96 relative">
+                <Image
+                  src={chef.image_url || "/chef1 (1).png"}
+                  alt={chef.name}
+                  width={500}
+                  height={500}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              <div className="md:col-span-7 space-y-4">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold uppercase tracking-wider">
+                  <HiOutlineSparkles /> {chef.position || "Executive Chef"}
+                </span>
+
+                <h1 className="text-3xl sm:text-4xl font-black text-white">{chef.name}</h1>
+                <p className="text-sm text-amber-400 font-semibold">{chef.specialty}</p>
+
+                <p className="text-sm text-slate-300 leading-relaxed font-normal">
+                  {chef.description}
+                </p>
+
+                <div className="pt-4 border-t border-white/10 space-y-2 text-xs text-slate-400">
+                  <p><strong>Culinary Background:</strong> {chef.experience}</p>
+                  <p><strong>Accolades:</strong> {chef.awards || "Master Culinary Guild Member"}</p>
+                </div>
+
+                <div className="pt-4">
+                  <Link
+                    href="/shop"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold text-xs shadow-lg shadow-orange-600/30 transition hover:scale-105"
+                  >
+                    <span>Taste This Chef's Dishes</span>
+                    <HiOutlineArrowRight />
+                  </Link>
+                </div>
+              </div>
+
+            </div>
+          )}
+        </div>
       </div>
+
       <Footer />
     </div>
   );
 }
-
-export default DetailsPage;  // Default export of the component
-

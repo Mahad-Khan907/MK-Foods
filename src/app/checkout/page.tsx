@@ -1,14 +1,16 @@
-import Clientdata from '@/components/ui/Clientdata'
-import React from 'react'
-import Nav from '../components/Nav'
+import React from "react";
+import Nav from "../components/Nav";
+import Footer from "../components/Footer";
+import Clientdata from "@/components/ui/Clientdata";
 
-function page() {
+export default function CheckoutPage() {
   return (
-    <div>
-        <Nav/>
-        <Clientdata/>
+    <div className="bg-[#080c14] min-h-screen text-slate-100 flex flex-col justify-between">
+      <div>
+        <Nav />
+        <Clientdata />
+      </div>
+      <Footer />
     </div>
-  )
+  );
 }
-
-export default page
